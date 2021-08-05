@@ -1,0 +1,11 @@
+[package]
+org= "ballerinax"
+name= "microsoft.onenote"
+version= "1.0.0"
+authors = ["Ballerina"]
+keywords = ["Microsoft", "OneNote", "note"]
+repository = "https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote"
+license = ["Apache-2.0"]
+
+[build-options]
+observability-included=true
