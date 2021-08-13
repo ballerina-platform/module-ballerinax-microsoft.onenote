@@ -7,7 +7,7 @@ account using the [OneNote REST API](https://docs.microsoft.com/en-us/graph/api/
 
 |                             |           Version           |
 | ----------------------------|-----------------------------|
-| Ballerina Language          |  Ballerina Swan Lake Beta2  |
+| Ballerina Language          |  Ballerina Swan Lake Beta3  |
 | Microsoft Graph API         |  v1.0                       |
  
 ## Report issues

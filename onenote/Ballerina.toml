@@ -1,7 +1,7 @@
 [package]
 org= "ballerinax"
 name= "microsoft.onenote"
-version= "1.0.0"
+version= "1.0.1-SNAPSHOT"
 authors = ["Ballerina"]
 keywords = ["Microsoft", "OneNote", "note"]
 repository = "https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote"
