@@ -13,7 +13,7 @@ jobs:
               uses: ballerina-platform/ballerina-action@slbeta2
               with:
                   args:
-                      build -c ./onenote --skip-tests
+                      build -c ./onenote
               env:
                   REFRESH_URL: ${{ secrets.REFRESH_URL }}
                   REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
