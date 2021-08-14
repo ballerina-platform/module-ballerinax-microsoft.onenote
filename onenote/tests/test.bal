@@ -212,9 +212,15 @@ function testListPages() returns error? {
     runtime:sleep(5);
     Page[] pages = check oneNoteClient->listPages(sectionId);
     log:printInfo("No of pages: " + pages.length().toString());
-    log:printInfo("Title of test page: " + pages[0].title);
-    pageId = pages[0].id;
-    test:assertEquals(testPageTitle, pages[0].title);
+    boolean testPageFound = false;
+    foreach Page page in pages {
+        log:printInfo("Title: " + page.title);
+        if (page.title == testPageTitle) {
+            testPageFound = true;
+            pageId = page.id;
+        }
+    }
+    test:assertTrue(testPageFound);
 }
 
 @test:Config {
@@ -223,9 +229,16 @@ function testListPages() returns error? {
 }
 function testListPagesWithQuery() returns error? {
     log:printInfo("oneNoteClient->testListPagesWithQuery()");
-    Page[] pages = check oneNoteClient->listPages(sectionId, "$top=2&$count=true");
+    Page[] pages = check oneNoteClient->listPages(sectionId, "$top=5&$count=true");
     log:printInfo("No of pages: " + pages.length().toString());
-    test:assertEquals(testPageTitle, pages[0].title);
+    boolean testPageFound = false;
+    foreach Page page in pages {
+        log:printInfo(page.title);
+        if (page.title == testPageTitle) {
+            testPageFound = true;
+        }
+    }
+    test:assertTrue(testPageFound);
 }
 
 @test:Config {
