@@ -35,7 +35,8 @@ onenote/target
 /tests/resources
 
 # resources folder
-onenote/resources
+onenote/resources/*.json
+onenote/modules
 
 # idea files
 *.idea

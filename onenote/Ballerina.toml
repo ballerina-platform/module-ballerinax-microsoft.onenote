@@ -3,7 +3,7 @@ org= "ballerinax"
 name= "microsoft.onenote"
 version= "1.0.1-SNAPSHOT"
 authors = ["Ballerina"]
-keywords = ["Microsoft", "OneNote", "note"]
+keywords = ["content & files/notes", "cost/freemium", "vendor/microsoft"]
 repository = "https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote"
 license = ["Apache-2.0"]
 

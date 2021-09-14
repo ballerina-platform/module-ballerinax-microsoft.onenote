@@ -23,7 +23,7 @@ import ballerina/http;
 # + httpClient - HTTP Client
 @display {
     label: "Microsoft OneNote",
-    iconPath: "logo.png"
+    iconPath: "resources/microsoft.onenote.svg"
 }
 public isolated client class Client {
     private final http:Client httpClient;
@@ -35,11 +35,8 @@ public isolated client class Client {
     # 
     # + config - Configuration required to initialize the client
     # + return - An error if initialization fails
-    public isolated function init(Configuration config) returns error? {
-        self.httpClient = check new (BASE_URL, {
-            auth: config.authConfig,
-            secureSocket: config?.secureSocketConfig
-        });
+    public isolated function init(ConnectionConfig config) returns error? {
+        self.httpClient = check new (BASE_URL, config);
     }
 
     // Notebooks
@@ -266,10 +263,36 @@ public isolated client class Client {
 
 # OneNote Connection Configuration
 #
-# + authConfig - Auth configuration  
-# + secureSocketConfig - Optional. Secure socket configuration 
 @display{label: "Connection Config"} 
-public type Configuration record {
-    http:BearerTokenConfig|http:OAuth2RefreshTokenGrantConfig authConfig;
-    http:ClientSecureSocket secureSocketConfig?;
-};
+public type ConnectionConfig record {|
+    # Configurations related to client authentication
+    http:BearerTokenConfig|http:OAuth2RefreshTokenGrantConfig auth;
+    # The HTTP version understood by the client
+    string httpVersion = "1.1";
+    # Configurations related to HTTP/1.x protocol
+    http:ClientHttp1Settings http1Settings = {};
+    # Configurations related to HTTP/2 protocol
+    http:ClientHttp2Settings http2Settings = {};
+    # The maximum time to wait (in seconds) for a response before closing the connection
+    decimal timeout = 60;
+    # The choice of setting `forwarded`/`x-forwarded` header
+    string forwarded = "disable";
+    # Configurations associated with Redirection
+    http:FollowRedirects? followRedirects = ();
+    # Configurations associated with request pooling
+    http:PoolConfiguration? poolConfig = ();
+    # HTTP caching related configurations
+    http:CacheConfig cache = {};
+    # Specifies the way of handling compression (`accept-encoding`) header
+    http:Compression compression = http:COMPRESSION_AUTO;
+    # Configurations associated with the behaviour of the Circuit Breaker
+    http:CircuitBreakerConfig? circuitBreaker = ();
+    # Configurations associated with retrying
+    http:RetryConfig? retryConfig = ();
+    # Configurations associated with cookies
+    http:CookieConfig? cookieConfig = ();
+    # Configurations associated with inbound response size limits
+    http:ResponseLimitConfigs responseLimits = {};
+    #SSL/TLS-related options
+    http:ClientSecureSocket? secureSocket = ();
+|};
