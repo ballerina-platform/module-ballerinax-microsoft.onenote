@@ -19,10 +19,10 @@ import ballerinax/microsoft.onenote;
 ```
 
 ### Step 2: Create a new connector instance
-Create a `microsoft.onenote:Configuration` with the OAuth2 tokens obtained and initialize the connector with it.
+Create a `microsoft.onenote:ConnectionConfig` with the OAuth2 tokens obtained and initialize the connector with it.
 ```ballerina
-microsoft.onenote:Configuration configuration = {
-    authConfig: {
+microsoft.onenote:ConnectionConfig configuration = {
+    auth: {
         refreshUrl: <REFRESH_URL>,
         refreshToken : <REFRESH_TOKEN>,
         clientId : <CLIENT_ID>,

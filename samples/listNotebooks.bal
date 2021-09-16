@@ -16,8 +16,8 @@
 
 import ballerinax/microsoft.onenote;
 
-onenote:Configuration configuration = {
-    authConfig: {
+onenote:ConnectionConfig configuration = {
+    auth: {
         clientId: "clientId",
         clientSecret: "clientSecret",
         refreshToken: "refreshToken",

@@ -11,8 +11,7 @@ account using the [OneNote REST API](https://docs.microsoft.com/en-us/graph/api/
 | Microsoft Graph API         |  v1.0                       |
  
 ## Report issues
-
-To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina MS OneNote connector repository](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote)
+To report bugs, request new features, start new discussions, view project boards, etc., go to the [Ballerina Extended Library repository](https://github.com/ballerina-platform/ballerina-extended-library)
 
 ## Useful links
 - Discuss code changes of the Ballerina project in [ballerina-dev@googlegroups.com](mailto:ballerina-dev@googlegroups.com).
