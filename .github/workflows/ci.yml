@@ -11,7 +11,12 @@ jobs:
               uses: ballerina-platform/ballerina-action/@nightly
               with:
                   args:
-                      build -c ./onenote
+                      pack ./onenote
+            - name: Ballerina Test
+              uses: ballerina-platform/ballerina-action/@nightly
+              with:
+                  args:
+                      test ./onenote
               env:
                   REFRESH_URL: ${{ secrets.REFRESH_URL }}
                   REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}

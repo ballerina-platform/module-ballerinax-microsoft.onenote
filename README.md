@@ -28,11 +28,11 @@ Execute the commands below to build from the source.
 
 * To build the package:
     ```    
-    bal build -c ./onenote
+    bal pack ./onenote
     ```
-* To build the package without tests:
+* To test the package after build:
     ```
-    bal build -c --skip-tests ./onenote
+    bal test ./onenote
     ```
 ## Contributing to Ballerina
 As an open source project, Ballerina welcomes contributions from the community. 
