@@ -4,6 +4,7 @@ name= "microsoft.onenote"
 version= "2.0.0"
 authors = ["Ballerina"]
 keywords = ["Content & Files/Notes", "Cost/Freemium", "Vendor/Microsoft"]
+icon = "icon.png"
 repository = "https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote"
 license = ["Apache-2.0"]
 
