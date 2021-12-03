@@ -23,7 +23,7 @@ import ballerina/http;
 # + httpClient - HTTP Client
 @display {
     label: "Microsoft OneNote",
-    iconPath: "resources/microsoft.onenote.svg"
+    iconPath: "icon.png"
 }
 public isolated client class Client {
     private final http:Client httpClient;
