@@ -10,7 +10,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - name: Ballerina Build
-              uses: ballerina-platform/ballerina-action@slbeta2
+              uses: ballerina-platform/ballerina-action@slbeta6
               with:
                   args:
                       pack ./onenote
@@ -20,7 +20,7 @@ jobs:
                   CLIENT_ID: ${{ secrets.CLIENT_ID }}
                   CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
             - name: Ballerina Push
-              uses: ballerina-platform/ballerina-action@slbeta2
+              uses: ballerina-platform/ballerina-action@slbeta6
               with:
                   args:
                       push
