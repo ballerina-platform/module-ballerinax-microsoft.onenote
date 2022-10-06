@@ -188,7 +188,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.4.0"
+version = "2.4.1"
 dependencies = [
 	{org = "ballerina", name = "io"},
 	{org = "ballerina", name = "jballerina.java"},
@@ -289,6 +289,18 @@ dependencies = [
 
 [[package]]
 org = "ballerinax"
+name = "client.config"
+version = "1.0.1"
+dependencies = [
+	{org = "ballerina", name = "http"},
+	{org = "ballerina", name = "oauth2"}
+]
+modules = [
+	{org = "ballerinax", packageName = "client.config", moduleName = "client.config"}
+]
+
+[[package]]
+org = "ballerinax"
 name = "microsoft.onenote"
 version = "2.3.0"
 dependencies = [
@@ -296,7 +308,8 @@ dependencies = [
 	{org = "ballerina", name = "lang.runtime"},
 	{org = "ballerina", name = "log"},
 	{org = "ballerina", name = "os"},
-	{org = "ballerina", name = "test"}
+	{org = "ballerina", name = "test"},
+	{org = "ballerinax", name = "client.config"}
 ]
 modules = [
 	{org = "ballerinax", packageName = "microsoft.onenote", moduleName = "microsoft.onenote"}
