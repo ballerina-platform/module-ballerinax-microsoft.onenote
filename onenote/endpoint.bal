@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/http;
+import ballerinax/'client.config;
 
 # Ballerina Microsoft OneNote connector provides the capability to access Microsoft Graph OneNote API
 # It provides capability to perform perform CRUD (Create, Read, Update, and Delete) operations on [OneNote]
@@ -36,23 +37,7 @@ public isolated client class Client {
     # + config - Configuration required to initialize the client
     # + return - An error if initialization fails
     public isolated function init(ConnectionConfig config) returns error? {
-        http:ClientConfiguration httpClientConfig = {
-            auth: let var authConfig = config.auth in (authConfig is BearerTokenConfig ? authConfig : {...authConfig}),
-            httpVersion: config.httpVersion,
-            http1Settings: {...config.http1Settings},
-            http2Settings: config.http2Settings,
-            timeout: config.timeout,
-            forwarded: config.forwarded,
-            poolConfig: config.poolConfig,
-            cache: config.cache,
-            compression: config.compression,
-            circuitBreaker: config.circuitBreaker,
-            retryConfig: config.retryConfig,
-            responseLimits: config.responseLimits,
-            secureSocket: config.secureSocket,
-            proxy: config.proxy,
-            validation: config.validation
-        };
+        http:ClientConfiguration httpClientConfig = check config:constructHTTPClientConfig(config);
         self.httpClient = check new (BASE_URL, httpClientConfig);
     }
 
