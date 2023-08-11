@@ -2,6 +2,7 @@ Ballerina Connector For Microsoft OneNote
 ===================
 
 [![Build Status](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/workflows/CI/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-msgraph-onedrive/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/ballerina-platform/module-ballerinax-microsoft.onenote/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerinax-microsoft.onenote)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerinax-microsoft.onenote.svg)](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/commits/main)
 [![GraalVM Check](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/actions/workflows/build-with-bal-test-native.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/actions/workflows/build-with-bal-test-native.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -29,11 +30,11 @@ Execute the commands below to build from the source.
 
 * To build the package:
     ```    
-    bal pack ./onenote
+    bal build ./ballerina
     ```
 * To test the package after build:
     ```
-    bal test ./onenote
+    bal test ./ballerina
     ```
 ## Contributing to Ballerina
 As an open source project, Ballerina welcomes contributions from the community. 

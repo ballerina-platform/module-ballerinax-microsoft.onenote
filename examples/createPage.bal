@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerinax/microsoft.onenote;
-import ballerina/log;
 
 onenote:ConnectionConfig configuration = {
     auth: {
@@ -27,11 +26,6 @@ onenote:ConnectionConfig configuration = {
 };
 
 public function main() returns error? {
-    onenote:Client oneNoteClient = check new(configuration);
-    error? response = check oneNoteClient->deletePage("pageId");
-    if (response is error) {
-        log:printInfo("Failed to delete page");
-    } else {
-        log:printInfo("Deleted page");
-    }
+    onenote:Client oneNoteClient = check new (configuration);
+    onenote:Page page = check oneNoteClient->createPage("sectionId", "title", "Hello");
 }
