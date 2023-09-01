@@ -37,7 +37,8 @@ Client oneNoteClient = check new(configuration);
 string testNotebookName = "My Notebook";
 string testSectionName = "Quick Notes";
 string testPageTitle = "Test Page Title";
-string notebookId = "0-1D68E652C4776202!1086";
+string testSectionGroupName = "Test Section Group";
+string notebookId = "1-8ad0487a-f612-4368-9be6-d863712f9254";
 string sectionId = EMPTY_STRING;
 string sectionGroupId = EMPTY_STRING;
 string pageId = EMPTY_STRING;
@@ -143,7 +144,7 @@ function testListSectionGroups() returns error? {
     log:printInfo("No of section groups: " + sectionGroup.length().toString());
     log:printInfo("Display name of test section group: " + sectionGroup[0].displayName);
     sectionGroupId = sectionGroup[0].id;
-    test:assertEquals("testSectionGroup", sectionGroup[0].displayName);
+    test:assertEquals(testSectionGroupName, sectionGroup[0].displayName);
 }
 
 @test:Config {
@@ -154,7 +155,7 @@ function testListSectionGroupsWithQuery() returns error? {
     log:printInfo("oneNoteClient->testListSectionGroupsWithQuery()");
     SectionGroup[] sectionGroup = check oneNoteClient->listSectionGroups(notebookId, "$top=2&$count=true");
     log:printInfo("No of section groups: " + sectionGroup.length().toString());
-    test:assertEquals("testSectionGroup", sectionGroup[0].displayName);
+    test:assertEquals(testSectionGroupName, sectionGroup[0].displayName);
 }
 
 @test:Config {
