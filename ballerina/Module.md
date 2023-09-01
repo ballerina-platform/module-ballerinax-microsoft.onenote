@@ -44,4 +44,4 @@ public function main() returns error? {
 }
 ```
 
-**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/tree/main/samples)**
+**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/tree/main/examples)**

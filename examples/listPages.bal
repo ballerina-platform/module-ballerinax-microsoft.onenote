@@ -26,6 +26,6 @@ onenote:ConnectionConfig configuration = {
 };
 
 public function main() returns error? {
-    onenote:Client oneNoteClient = check new(configuration);
+    onenote:Client oneNoteClient = check new (configuration);
     onenote:Page[] pages = check oneNoteClient->listPages("sectionId");
 }

@@ -26,6 +26,6 @@ onenote:ConnectionConfig configuration = {
 };
 
 public function main() returns error? {
-    onenote:Client oneNoteClient = check new(configuration);
-    onenote:SectionGroup sectionGroup = check oneNoteClient->createSectionGroup("notebookId", "testSectionGroup");
+    onenote:Client oneNoteClient = check new (configuration);
+    onenote:Notebook notebook = check oneNoteClient->createNotebook("test");
 }

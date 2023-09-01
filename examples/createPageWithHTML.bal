@@ -26,7 +26,7 @@ onenote:ConnectionConfig configuration = {
 };
 
 public function main() returns error? {
-    onenote:Client oneNoteClient = check new(configuration);
+    onenote:Client oneNoteClient = check new (configuration);
     string testHtmlContent = "<!DOCTYPE html><html><head><title>Test</title></head><body><p>Hello</p></body></html>";
     onenote:Page page = check oneNoteClient->createPageWithHTML("sectionId", testHtmlContent);
 }
