@@ -1,7 +1,15 @@
 ## Overview
-Ballerina connector for Microsoft OneNote connects the [Microsoft OneNote API](https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0) through Ballerina. It provides the capability to perform CRUD operations on OneNote notebooks, sections and pages.
+The connector for Microsoft OneNote connects the [Microsoft OneNote API](https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0) through Ballerina. It provides the capability to perform CRUD operations on OneNote notebooks, sections and pages.
 
 This module supports [Microsoft Graph API](https://docs.microsoft.com/en-us/graph/overview) v1.0 version and only allows to perform functions behalf of the currently logged in user.
+
+
+### Key Features
+
+- Create and manage OneNote notebooks and sections
+- Add and update pages with rich content
+- Access notebook content via Microsoft Graph API
+- Search across OneNote resources
 
 ## Prerequisites
 Before using this connector in your Ballerina application, complete the following:
