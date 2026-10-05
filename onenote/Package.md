@@ -1,9 +1,14 @@
 Connects to Microsoft OneNote from Ballerina
 
-## Package overview
+## Overview
 The `microsoft.onenote` is a [Ballerina](https://ballerina.io/) connector for Microsoft OneNote.
 This package provides the capability to access to a user's OneNote notebooks, sections, and pages in a personal 
 account using the [OneNote REST API](https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0)
+
+### Key Features
+- Create, retrieve, update, and delete OneNote notebooks, sections, and pages
+- Access a user's OneNote content in a personal account through the Microsoft Graph API v1.0
+- Authenticate with OAuth2 refresh token credentials
 
 |                             |           Version              |
 | ----------------------------|--------------------------------|
