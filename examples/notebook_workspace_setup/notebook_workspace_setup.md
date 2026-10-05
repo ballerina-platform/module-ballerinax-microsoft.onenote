@@ -1,6 +1,6 @@
 # Notebook workspace setup
 
-This example sets up a OneNote workspace for a project. It reuses the notebook when one with the given name already exists (or creates it), adds a section group and a section to it, and lists the sections the notebook now holds.
+This example sets up a OneNote workspace for a project. It reuses the notebook when one with the given name already exists (or creates it), adds a section group to it, creates a section inside that section group, and lists the section group's sections.
 
 ## Prerequisites
 

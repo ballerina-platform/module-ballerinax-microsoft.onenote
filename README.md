@@ -63,6 +63,12 @@ To use the Microsoft OneNote connector, you need a Microsoft 365 or Outlook.com 
 
 3. Exchange the code for tokens:
 
+   Read the client secret into an environment variable without echoing it, so that it does not appear in the command or the shell history:
+
+   ```bash
+   read -rs CLIENT_SECRET && export CLIENT_SECRET
+   ```
+
    ```bash
    curl --location 'https://login.microsoftonline.com/common/oauth2/v2.0/token' \
    --header 'Content-Type: application/x-www-form-urlencoded' \
@@ -70,7 +76,7 @@ To use the Microsoft OneNote connector, you need a Microsoft 365 or Outlook.com 
    --data-urlencode 'code=<CODE>' \
    --data-urlencode 'redirect_uri=<REDIRECT_URI>' \
    --data-urlencode 'client_id=<CLIENT_ID>' \
-   --data-urlencode 'client_secret=<CLIENT_SECRET>' \
+   --data-urlencode "client_secret=${CLIENT_SECRET}" \
    --data-urlencode 'scope=Notes.ReadWrite Notes.Create Notes.ReadWrite.All offline_access'
    ```
 
@@ -98,6 +104,8 @@ Create a `Config.toml` file with the credentials obtained in the setup guide:
 clientId = "<CLIENT_ID>"
 clientSecret = "<CLIENT_SECRET>"
 refreshToken = "<REFRESH_TOKEN>"
+# Multi-tenant registrations only. For a single-tenant registration, use
+# "https://login.microsoftonline.com/<TENANT_ID>/oauth2/v2.0/token".
 refreshUrl = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
 ```
 
@@ -130,7 +138,7 @@ public function main() returns error? {
 
 The Microsoft OneNote connector provides practical examples illustrating usage in various scenarios. Explore these [examples](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/tree/main/examples/), covering the following use cases:
 
-1. [Notebook workspace setup](examples/notebook_workspace_setup/notebook_workspace_setup.md) - Find or create a notebook, then add a section group and a section to it and list the notebook's sections.
+1. [Notebook workspace setup](examples/notebook_workspace_setup/notebook_workspace_setup.md) - Find or create a notebook, then add a section group with a section inside it and list the section group's sections.
 2. [Page content export](examples/page_content_export/page_content_export.md) - Walk a section page by page, report each page's HTML content and optionally copy the pages into another section.
 
 ## Build from the source

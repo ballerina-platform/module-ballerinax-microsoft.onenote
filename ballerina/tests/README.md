@@ -35,6 +35,8 @@ Set the following environment variables, then run the tests.
 
 The live tests use identifiers that exist only in the mock server, so they need the constants at the top of `test.bal` replaced with the identifiers of a notebook, section, section group, page and operation in your account.
 
+> **Warning:** The live tests modify the configured notebook. They create, update and delete notebooks, sections, section groups and pages, and copy notebooks and pages, and they do not clean up everything they create. Run them only against a disposable test account or notebook.
+
 ```bash
 ./gradlew clean test -Pgroups=live_tests
 ```

@@ -21,3 +21,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - All operations are generated as remote methods, named after the action and the resource they act on, for example
   `listNotebooks`, `createNotebookSection` and `getUserNotebook`.
 - The `@odata.type` property of the Microsoft Graph records is optional.
+- **Breaking:** the methods kept from the previous connector (`createNotebook`, `listNotebooks`, `getNotebook`,
+  `getRecentNotebooks`, `listSections`, `getSection`, `createSection`, `listSectionGroups`, `createSectionGroup`,
+  `getSectionGroup`, `listPages`, `getPage`, `createPage` and `deletePage`) now take Microsoft Graph records and OData
+  query parameters, and return the Microsoft Graph collection and entity records. `Notebook`, `RecentNotebook` and
+  `SectionGroup` are now the Microsoft Graph records rather than the previous flat records.
+
+### Removed
+
+- **Breaking:** the `createSectionInSectionGroup` and `createPageWithHTML` client methods. Use `createGroupSection` to
+  create a section in a section group. The operation each API path maps to is listed under `operationIds` in
+  `docs/spec/ai-mappings.json`.
+- **Breaking:** the flat `Section` and `Page` records, replaced by `OnenoteSection` and `OnenotePage`.

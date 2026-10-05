@@ -15,7 +15,7 @@
 // under the License.
 
 // Sets up a OneNote workspace for a project: finds or creates the notebook, then adds a section
-// group and a section to it, and lists the sections the notebook now holds.
+// group to it with a section inside that group, and lists the section group's sections.
 
 import ballerina/io;
 import ballerinax/microsoft.onenote;
@@ -35,7 +35,7 @@ public function main() returns error? {
 
     // Reuse the notebook when it already exists so that re-running does not create duplicates.
     onenote:NotebookCollectionResponse notebooks = check onenote->listNotebooks(
-        filter = string `displayName eq '${notebookName}'`);
+        filter = string `displayName eq '${escapeODataString(notebookName)}'`);
     onenote:Notebook[] existing = notebooks?.value ?: [];
     onenote:Notebook notebook;
     if existing.length() > 0 {
@@ -51,14 +51,21 @@ public function main() returns error? {
 
     onenote:SectionGroup sectionGroup = check onenote->createNotebookSectionGroup(
         notebookId, {displayName: sectionGroupName});
+    string sectionGroupId = sectionGroup?.id ?: "";
+    if sectionGroupId == "" {
+        return error("The section group has no identifier");
+    }
     io:println("Section group created: ", sectionGroup?.displayName);
 
-    onenote:OnenoteSection section = check onenote->createNotebookSection(
-        notebookId, {displayName: sectionName});
-    io:println("Section created: ", section?.displayName);
+    onenote:OnenoteSection section = check onenote->createGroupSection(
+        sectionGroupId, {displayName: sectionName});
+    io:println("Section created in the section group: ", section?.displayName);
 
-    onenote:OnenoteSectionCollectionResponse sections = check onenote->listNotebookSections(notebookId);
+    onenote:OnenoteSectionCollectionResponse sections = check onenote->listGroupSections(sectionGroupId);
     foreach onenote:OnenoteSection item in sections?.value ?: [] {
-        io:println("Section in notebook: ", item?.displayName);
+        io:println("Section in section group: ", item?.displayName);
     }
 }
+
+// Doubles each apostrophe so that the value is a valid OData string literal.
+function escapeODataString(string value) returns string => re `'`.replaceAll(value, "''");

@@ -32,12 +32,17 @@ configurable boolean copyPages = false;
 configurable string targetSectionId = "";
 
 public function main() returns error? {
+    // Microsoft Graph returns at most 100 pages per request; a zero or negative size would never advance.
+    if pageSize < 1 || pageSize > 100 {
+        return error(string `pageSize must be between 1 and 100, but was ${pageSize}`);
+    }
+
     onenote:Client onenote = check new ({
         auth: {clientId, clientSecret, refreshToken, refreshUrl}
     });
 
     onenote:NotebookCollectionResponse notebooks = check onenote->listNotebooks(
-        filter = string `displayName eq '${notebookName}'`);
+        filter = string `displayName eq '${escapeODataString(notebookName)}'`);
     onenote:Notebook[] matches = notebooks?.value ?: [];
     if matches.length() == 0 {
         return error(string `Notebook '${notebookName}' was not found`);
@@ -45,7 +50,7 @@ public function main() returns error? {
     string notebookId = matches[0]?.id ?: "";
 
     onenote:OnenoteSectionCollectionResponse sections = check onenote->listNotebookSections(
-        notebookId, filter = string `displayName eq '${sectionName}'`);
+        notebookId, filter = string `displayName eq '${escapeODataString(sectionName)}'`);
     onenote:OnenoteSection[] sectionMatches = sections?.value ?: [];
     if sectionMatches.length() == 0 {
         return error(string `Section '${sectionName}' was not found in the notebook`);
@@ -78,3 +83,6 @@ public function main() returns error? {
     }
     io:println("Pages processed: ", total);
 }
+
+// Doubles each apostrophe so that the value is a valid OData string literal.
+function escapeODataString(string value) returns string => re `'`.replaceAll(value, "''");

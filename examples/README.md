@@ -2,7 +2,7 @@
 
 The `ballerinax/microsoft.onenote` connector provides practical examples illustrating usage in various scenarios.
 
-1. **[Notebook workspace setup](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/tree/main/examples/notebook_workspace_setup)** - Find or create a notebook, then add a section group and a section to it and list the notebook's sections.
+1. **[Notebook workspace setup](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/tree/main/examples/notebook_workspace_setup)** - Find or create a notebook, then add a section group with a section inside it and list the section group's sections.
 
 2. **[Page content export](https://github.com/ballerina-platform/module-ballerinax-microsoft.onenote/tree/main/examples/page_content_export)** - Walk a section page by page, report each page's HTML content and optionally copy the pages into another section.
 
