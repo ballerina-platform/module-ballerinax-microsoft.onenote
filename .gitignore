@@ -54,5 +54,5 @@ build
 # Ignore Docker env file
 docker.env
 
-# Cached Microsoft Graph v1.0 source spec (docs/resources/script.py)
-docs/resources/msgraph-v1.0-openapi.yaml
+# Example build artifacts
+examples/*/Dependencies.toml
