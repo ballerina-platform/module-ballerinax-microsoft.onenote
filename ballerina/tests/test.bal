@@ -1,6 +1,6 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2026, WSO2 LLC. (http://www.wso2.com).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -14,292 +14,176 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/log;
 import ballerina/os;
 import ballerina/test;
-import ballerina/lang.runtime;
 
-configurable string refreshUrl = os:getEnv("REFRESH_URL");
-configurable string refreshToken = os:getEnv("REFRESH_TOKEN");
-configurable string clientId = os:getEnv("CLIENT_ID");
-configurable string clientSecret = os:getEnv("CLIENT_SECRET");
+final boolean isLiveServer = os:getEnv("IS_LIVE_SERVER") == "true";
+final string serviceUrl = isLiveServer ? "https://graph.microsoft.com/v1.0" : "http://localhost:9090";
+final string accessToken = isLiveServer ? os:getEnv("MICROSOFT_ONENOTE_ACCESS_TOKEN") : "test_token";
+final string testUserId = isLiveServer ? os:getEnv("MICROSOFT_ONENOTE_USER_ID") : "user-1";
 
-ConnectionConfig configuration = {
-    auth: {
-        clientId: clientId,
-        clientSecret: clientSecret,
-        refreshToken: refreshToken,
-        refreshUrl: refreshUrl
-    }
-};
+final Client onenote = check new ({
+    auth: {token: accessToken},
+    httpVersion: isLiveServer ? "2.0" : "1.1"
+}, serviceUrl);
 
-Client oneNoteClient = check new(configuration);
-string testNotebookName = "My Notebook";
-string testSectionName = "Quick Notes";
-string testPageTitle = "Test Page Title";
-string testSectionGroupName = "Test Section Group";
-string notebookId = "1-8ad0487a-f612-4368-9be6-d863712f9254";
-string sectionId = EMPTY_STRING;
-string sectionGroupId = EMPTY_STRING;
-string pageId = EMPTY_STRING;
-string pageId2 = EMPTY_STRING;
-string pageId3 = EMPTY_STRING;
+const string NOTEBOOK_ID = "1-4f9c1c7e-0a1b-4d32-9d5a-7b0c1e2f3a41";
+const string SECTION_ID = "1-7c1d2e3f-4a5b-4c6d-8e7f-90a1b2c3d401";
+const string SECTION_GROUP_ID = "1-1a2b3c4d-5e6f-4789-9abc-def012345601";
+const string PAGE_ID = "1-2b7f3a10-9c4d-4e5f-a6b7-c8d9e0f1a201";
+const string OPERATION_ID = "1-5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d";
 
-@test:Config {
-    enable: true
-}
-function testListNotebooks() returns error? {
-    log:printInfo("oneNoteClient->listNotebooks()");
-    Notebook[] notebooks = check oneNoteClient->listNotebooks();
-    log:printInfo("Number of notebooks available: " + notebooks.length().toString());
-    log:printInfo("Name of test notebook: " + notebooks[0].displayName);
-    test:assertEquals(notebookId, notebooks[0].id);
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testCopyNotebook() returns error? {
+    OnenoteOperation response = check onenote->copyNotebook(NOTEBOOK_ID, {renameAs: "Notebook Copy"});
+    test:assertTrue(response?.id !is ());
 }
 
-@test:Config {
-    enable: true
-}
-function testListNotebooksWithQuery() returns error? {
-    log:printInfo("oneNoteClient->testListNotebooksWithQuery()");
-    Notebook[] notebooks = check oneNoteClient->listNotebooks("$top=2&$count=true");
-    log:printInfo("Number of notebooks available: " + notebooks.length().toString());
-    test:assertEquals(notebookId, notebooks[0].id);
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testCopyPageToSection() returns error? {
+    OnenoteOperation response = check onenote->copyPageToSection(PAGE_ID, {id: SECTION_ID});
+    test:assertTrue(response?.id !is ());
 }
 
-@test:Config {
-    enable: true,
-    dependsOn: [testListNotebooks]
-}
-function testGetNotebook() returns error? {
-    log:printInfo("oneNoteClient->getNotebook()");
-    Notebook notebook = check oneNoteClient->getNotebook(notebookId);
-    log:printInfo("Notebook name: " + notebook.displayName);
-    test:assertEquals(testNotebookName, notebook.displayName);
-}
-
-@test:Config {
-    enable: true
-}
-function testGetRecentNotebooks() returns error? {
-    log:printInfo("oneNoteClient->getRecentNotebooks()");
-    RecentNotebook[] recentNotebooks = check oneNoteClient->getRecentNotebooks();
-    log:printInfo("Number of notebooks: " + recentNotebooks.length().toString());
-    log:printInfo("Display name of test notebook: " + recentNotebooks[0].displayName);
-    test:assertEquals(testNotebookName, recentNotebooks[0].displayName);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testListNotebooks]
-}
-function testListSections() returns error? {
-    log:printInfo("oneNoteClient->testListSections()");
-    Section[] sections = check oneNoteClient->listSections(notebookId);
-    log:printInfo("No of sections in notebook " + notebookId + " -> " + sections.length().toString());
-    log:printInfo("Display name of test section: " + sections[0].displayName);
-    sectionId = sections[0].id;
-    test:assertEquals(testSectionName, sections[0].displayName);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testListNotebooks]
-}
-function testListSectionsWithQuery() returns error? {
-    log:printInfo("oneNoteClient->testListSectionsWithQuery()");
-    Section[] sections = check oneNoteClient->listSections(notebookId, "$top=2&$count=true");
-    log:printInfo("No of sections in notebook " + notebookId + " -> " + sections.length().toString());
-    test:assertEquals(testSectionName, sections[0].displayName);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testListSections]
-}
-function testGetSection() returns error? {
-    log:printInfo("oneNoteClient->testGetSection()");
-    Section section = check oneNoteClient->getSection(sectionId);
-    log:printInfo("Name of the section: " + section.displayName);
-    test:assertEquals(sectionId, section.id);
-}
-
-@test:Config {
-    enable: false,
-    dependsOn: [testListSections]
-}
-function testCreateSection() returns error? {
-    log:printInfo("oneNoteClient->testCreateSection()");
-    Section section = check oneNoteClient->createSection("0-4158FCD360E478B!432", "testSection");
-    log:printInfo("Name of the created section: " + section.displayName);
-    test:assertEquals("testSection", section.displayName);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testListSections]
-}
-function testListSectionGroups() returns error? {
-    log:printInfo("oneNoteClient->testListSectionGroups()");
-    SectionGroup[] sectionGroup = check oneNoteClient->listSectionGroups(notebookId);
-    log:printInfo("No of section groups: " + sectionGroup.length().toString());
-    log:printInfo("Display name of test section group: " + sectionGroup[0].displayName);
-    sectionGroupId = sectionGroup[0].id;
-    test:assertEquals(testSectionGroupName, sectionGroup[0].displayName);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testListSections]
-}
-function testListSectionGroupsWithQuery() returns error? {
-    log:printInfo("oneNoteClient->testListSectionGroupsWithQuery()");
-    SectionGroup[] sectionGroup = check oneNoteClient->listSectionGroups(notebookId, "$top=2&$count=true");
-    log:printInfo("No of section groups: " + sectionGroup.length().toString());
-    test:assertEquals(testSectionGroupName, sectionGroup[0].displayName);
-}
-
-@test:Config {
-    enable: false
-}
+@test:Config {groups: ["live_tests", "mock_tests"]}
 function testCreateNotebook() returns error? {
-    log:printInfo("oneNoteClient->createNotebook()");
-    string name = "testNotebook1";
-    Notebook notebook = check oneNoteClient->createNotebook(name);
-    log:printInfo("Created Notebook name: " + notebook.displayName + " Id: " + notebook.id);
-    test:assertEquals(name, notebook.displayName);
+    Notebook response = check onenote->createNotebook({displayName: "Test Notebook"});
+    test:assertTrue(response?.id !is ());
+    test:assertEquals(response?.displayName, "Test Notebook");
 }
 
-@test:Config {
-    enable: false,
-    dependsOn: [testListNotebooks]
-}
-function testCreateSectionGroup() returns error? {
-    log:printInfo("oneNoteClient->testCreateSectionGroup()");
-    string name = "testSectionGroup";
-    SectionGroup sectionGroup = check oneNoteClient->createSectionGroup(notebookId, name);
-    log:printInfo("Created section group: " + sectionGroup.displayName);
-    test:assertEquals(name, sectionGroup.displayName);
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testCreateNotebookSection() returns error? {
+    OnenoteSection response = check onenote->createNotebookSection(NOTEBOOK_ID, {displayName: "Test Section"});
+    test:assertTrue(response?.id !is ());
+    test:assertEquals(response?.displayName, "Test Section");
 }
 
-@test:Config {
-    enable: false,
-    dependsOn: [testListSectionGroups]
-}
-function testCreateSectionInSectionGroup() returns error? {
-    log:printInfo("oneNoteClient->testCreateSectionInSectionGroup()");
-    string name = "section2";
-    Section section = check oneNoteClient->createSectionInSectionGroup(sectionGroupId, "section2");
-    log:printInfo("Created section: " + section.displayName);
-    test:assertEquals(name, section.displayName);
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testCreateNotebookSectionGroup() returns error? {
+    SectionGroup response = check onenote->createNotebookSectionGroup(NOTEBOOK_ID, {displayName: "Test Group"});
+    test:assertTrue(response?.id !is ());
+    test:assertEquals(response?.displayName, "Test Group");
 }
 
-@test:Config {
-    enable: true,
-    dependsOn: [testListSectionGroups]
-}
-function getSectionGroup() returns error? {
-    log:printInfo("oneNoteClient->getSectionGroup()");
-    SectionGroup sectionGroup = check oneNoteClient->getSectionGroup(sectionGroupId);
-    log:printInfo("Section group name: " + sectionGroup.displayName);
-    test:assertEquals(sectionGroupId, sectionGroup.id);
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testCreateSectionPage() returns error? {
+    OnenotePage response = check onenote->createSectionPage(SECTION_ID, {title: "Test Page"});
+    test:assertTrue(response?.id !is ());
+    test:assertEquals(response?.title, "Test Page");
 }
 
-@test:Config {
-    enable: true,
-    dependsOn: [testListSections, testDeletePage]
-}
-function testListPages() returns error? {
-    log:printInfo("oneNoteClient->testListPages()");
-    runtime:sleep(5);
-    Page[] pages = check oneNoteClient->listPages(sectionId);
-    log:printInfo("No of pages: " + pages.length().toString());
-    boolean testPageFound = false;
-    foreach Page page in pages {
-        log:printInfo("Title: " + page.title);
-        if (page.title == testPageTitle) {
-            testPageFound = true;
-            pageId = page.id;
-        }
-    }
-    test:assertTrue(testPageFound);
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testDeleteNotebook() returns error? {
+    Notebook created = check onenote->createNotebook({displayName: "Notebook To Delete"});
+    string notebookId = <string>created?.id;
+    check onenote->deleteNotebook(notebookId);
 }
 
-@test:Config {
-    enable: true,
-    dependsOn: [testListSections, testListPages]
-}
-function testListPagesWithQuery() returns error? {
-    log:printInfo("oneNoteClient->testListPagesWithQuery()");
-    Page[] pages = check oneNoteClient->listPages(sectionId, "$top=5&$count=true");
-    log:printInfo("No of pages: " + pages.length().toString());
-    boolean testPageFound = false;
-    foreach Page page in pages {
-        log:printInfo(page.title);
-        if (page.title == testPageTitle) {
-            testPageFound = true;
-        }
-    }
-    test:assertTrue(testPageFound);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testListPages]
-}
-function testGetPage() returns error? {
-    log:printInfo("oneNoteClient->testGetPage()");
-    Page page = check oneNoteClient->getPage(pageId);
-    log:printInfo("Page title: " + page.title);
-    test:assertEquals(testPageTitle, page.title);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testListSections]
-}
-function testCreatePageWithHTML() returns error? {
-    log:printInfo("oneNoteClient->testCreatePageWithHTML()");
-    string testHtmlContent = "<!DOCTYPE html><html><head><title>Test Page Title</title></head><body><p>Hello</p></body></html>";
-    Page page = check oneNoteClient->createPageWithHTML(sectionId, testHtmlContent);
-    log:printInfo("Created page title: " + page.title);
-    pageId2 = page.id;
-    test:assertEquals("Test Page Title", page.title);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testCreatePageWithHTML]
-}
-function testDeleteHTMLPage() returns error? {
-    log:printInfo("oneNoteClient->testDeleteHTMLPage()");
-    runtime:sleep(5);
-    error? response = oneNoteClient->deletePage(pageId2);
-    if (response is error) {
-        test:assertFail("Error in deleting page: " + pageId2 + response.toString());
-    }
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testDeleteHTMLPage]
-}
-function testCreatePage() returns error? {
-    log:printInfo("oneNoteClient->testCreatePage()");
-    Page page = check oneNoteClient->createPage(sectionId, pageTitle = "Test Page2 Title", pageBody = "Hi");
-    log:printInfo("Created page title: " + page.title);
-    pageId3 = page.id;
-    test:assertEquals("Test Page2 Title", page.title);
-}
-
-@test:Config {
-    enable: true,
-    dependsOn: [testCreatePage]
-}
+@test:Config {groups: ["live_tests", "mock_tests"]}
 function testDeletePage() returns error? {
-    log:printInfo("oneNoteClient->testDeletePage()");
-    runtime:sleep(5);
-    error? response = oneNoteClient->deletePage(pageId3);
-    if (response is error) {
-        test:assertFail("Error in deleting page: " + pageId3 + response.toString());
-    }
+    OnenotePage created = check onenote->createSectionPage(SECTION_ID, {title: "Page To Delete"});
+    string pageId = <string>created?.id;
+    check onenote->deletePage(pageId);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetNotebook() returns error? {
+    Notebook response = check onenote->getNotebook(NOTEBOOK_ID);
+    test:assertEquals(response?.id, NOTEBOOK_ID);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetNotebookFromWebUrl() returns error? {
+    CopyNotebookModel response = check onenote->getNotebookFromWebUrl({webUrl: "https://contoso.sharepoint.com/personal/user/Notebooks/Project Notes"});
+    test:assertTrue(response?.id !is ());
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetOperation() returns error? {
+    OnenoteOperation response = check onenote->getOperation(OPERATION_ID);
+    test:assertEquals(response?.id, OPERATION_ID);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetPage() returns error? {
+    OnenotePage response = check onenote->getPage(PAGE_ID);
+    test:assertEquals(response?.id, PAGE_ID);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetPageContent() returns error? {
+    byte[] response = check onenote->getPageContent(PAGE_ID);
+    test:assertTrue(response.length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetSection() returns error? {
+    OnenoteSection response = check onenote->getSection(SECTION_ID);
+    test:assertEquals(response?.id, SECTION_ID);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetSectionGroup() returns error? {
+    SectionGroup response = check onenote->getSectionGroup(SECTION_GROUP_ID);
+    test:assertEquals(response?.id, SECTION_GROUP_ID);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testGetUserNotebook() returns error? {
+    Notebook response = check onenote->getUserNotebook(testUserId, NOTEBOOK_ID);
+    test:assertEquals(response?.id, NOTEBOOK_ID);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testListNotebookSectionGroups() returns error? {
+    SectionGroupCollectionResponse response = check onenote->listNotebookSectionGroups(NOTEBOOK_ID);
+    test:assertTrue((response?.value ?: []).length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testListNotebookSections() returns error? {
+    OnenoteSectionCollectionResponse response = check onenote->listNotebookSections(NOTEBOOK_ID);
+    test:assertTrue((response?.value ?: []).length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testListNotebooks() returns error? {
+    NotebookCollectionResponse response = check onenote->listNotebooks();
+    test:assertTrue((response?.value ?: []).length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testListPages() returns error? {
+    OnenotePageCollectionResponse response = check onenote->listPages();
+    test:assertTrue((response?.value ?: []).length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testListSectionPages() returns error? {
+    OnenotePageCollectionResponse response = check onenote->listSectionPages(SECTION_ID);
+    test:assertTrue((response?.value ?: []).length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testListSections() returns error? {
+    OnenoteSectionCollectionResponse response = check onenote->listSections();
+    test:assertTrue((response?.value ?: []).length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testListUserNotebooks() returns error? {
+    NotebookCollectionResponse response = check onenote->listUserNotebooks(testUserId);
+    test:assertTrue((response?.value ?: []).length() > 0);
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testPatchPageContent() returns error? {
+    check onenote->patchPageContent(PAGE_ID, {commands: [<OnenotePatchContentCommand>{action: "Append", target: "body", content: "<p>Added paragraph</p>"}]});
+}
+
+@test:Config {groups: ["live_tests", "mock_tests"]}
+function testUpdateNotebook() returns error? {
+    Notebook response = check onenote->updateNotebook(NOTEBOOK_ID, {displayName: "Renamed Notebook"});
+    test:assertEquals(response?.displayName, "Renamed Notebook");
 }

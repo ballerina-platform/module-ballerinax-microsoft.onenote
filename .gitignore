@@ -53,3 +53,6 @@ build
 
 # Ignore Docker env file
 docker.env
+
+# Example build artifacts
+examples/*/Dependencies.toml
