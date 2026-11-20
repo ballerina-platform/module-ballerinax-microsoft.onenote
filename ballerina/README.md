@@ -6,86 +6,123 @@ The Microsoft OneNote connector lets Ballerina applications manage the notebooks
 
 ### Key features
 
-- Create, read, update and delete notebooks, section groups, sections and pages for the signed-in user (`/me`) and for a user by ID (`/users/{userId}`)
+- Create, read, update and delete notebooks, section groups, sections and pages for the signed-in user and for a user by ID
 - Navigate the notebook hierarchy, including the parent notebook and parent section group of any section or page
 - Read page content as HTML, replace it, and apply targeted edits with patch commands
 - Copy notebooks, sections and pages, and track the long-running copy operations
 - Find a notebook from its web URL and list the notebooks the user opened recently
-- Count notebooks, sections, section groups and pages, and shape results with `$select`, `$expand`, `$filter`, `$orderby`, `$top` and `$skip`
+- Count notebooks, sections, section groups and pages, and shape results
 
 ## Setup guide
 
-To use the Microsoft OneNote connector, you need a Microsoft 365 or Outlook.com account and an application registered in Microsoft Entra ID with OAuth 2.0 credentials.
+To use the Microsoft OneNote connector, you need a Microsoft 365 or Outlook.com account and an application registered in Microsoft Entra ID.
 
-### Step 1: Sign in to the Azure portal
+> **Note:** The screenshots in this guide are for illustration only. The Microsoft Entra admin center changes over time, so treat them as a visual reference rather than an exact match — follow the described actions and choose the values (application name, redirect URI, permissions, and so on) that fit your own scenario.
 
-1. If you don't have a Microsoft Azure account, you can create one for free at [https://azure.microsoft.com](https://azure.microsoft.com).
+### Step 1: Register an application in Microsoft Entra ID
 
-2. Go to the [Azure portal](https://portal.azure.com) and sign in. From the home page, navigate to **Microsoft Entra ID**.
+1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com).
+2. Navigate to **Entra ID** > **App registrations** and click **New registration**.
 
-### Step 2: Register an application
+   ![App registrations](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-1.jpg)
 
-1. In the Microsoft Entra admin center, navigate to **App registrations** from the left sidebar.
+3. Enter a name of your choice and select the supported account types: accounts in your organization only, or accounts in any organization and personal Microsoft accounts if Outlook.com users must be able to sign in. Under **Redirect URI**, select the **Web** platform and enter the URI that receives the authorization code (a Microsoft-hosted page such as `https://jwt.ms` is a convenient choice for Step 4). The **Web** platform is required because the connector redeems the code using a client secret (a confidential-client flow); the public "Mobile and desktop applications" platform does not accept a client secret. Click **Register**.
 
-2. Click **New registration**.
+   ![Register an application](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-2.jpg)
 
-3. Enter a name for the application, for example `Ballerina OneNote Connector`. Under **Supported account types**, choose the accounts that will sign in: accounts in your organization only, or any organization and personal Microsoft accounts if Outlook.com users must be able to sign in.
+4. On the app's **Overview** page, note the **Application (client) ID** and **Directory (tenant) ID**.
 
-4. Under **Redirect URI**, select **Web** and enter the URI that receives the authorization code, for example `http://localhost`. Then click **Register**.
+   ![Overview of application](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-3.png)
 
-### Step 3: Add API permissions
+### Step 2: Add Microsoft Graph permissions
 
-1. In the registered application, navigate to **API permissions** and click **Add a permission**.
+1. In the registered application, go to **API permissions** > **Add a permission** > **Microsoft Graph**.
 
-2. Select **Microsoft Graph**, then **Delegated permissions**, and add the following permissions:
+   ![Select Microsoft Graph](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-4.png)
+
+2. Choose **Delegated permissions** and add the following permissions, then click **Add permissions**:
 
    - `Notes.ReadWrite` to read and write the signed-in user's notebooks
    - `Notes.Create` to create notebooks, sections and pages in the signed-in user's account
    - `Notes.ReadWrite.All` to read and write notebooks that other users have shared with the signed-in user (needed for the operations under `users/{userId}`)
    - `offline_access` so that the token response includes a refresh token
 
-3. Click **Add permissions**. If your organization requires it, ask an administrator to grant consent.
+   ![Request API permissions](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-5.jpg)
 
-### Step 4: Create a client secret
+3. If your organization requires administrator consent, click **Grant admin consent for \<your tenant\>** on the **API permissions** page and confirm **Yes**.
 
-1. Navigate to **Overview** in the registered application and copy the **Application (client) ID**. This is your `clientId`.
+   ![Grant admin consent](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-6.png)
 
-2. Navigate to **Certificates & secrets** > **Client secrets** > **New client secret**.
+4. Confirm the permissions are listed under **Configured permissions**, with **Granted for \<your tenant\>** in the **Status** column if you granted admin consent.
 
-3. Enter a description, choose an expiry period and click **Add**. Copy the secret **Value** immediately. This is your `clientSecret`.
+   ![Configured permissions](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-7.png)
 
-### Step 5: Obtain a refresh token
+### Step 3: Create a client secret
 
-1. Open the following URL in a browser, replacing `<CLIENT_ID>` and `<REDIRECT_URI>` with your values, and sign in with the account whose notebooks the connector will use:
+1. Go to **Certificates & secrets** > **New client secret**, add a description and an expiry, and click **Add**.
 
-   ```text
-   https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=<CLIENT_ID>&response_type=code&redirect_uri=<REDIRECT_URI>&response_mode=query&scope=Notes.ReadWrite%20Notes.Create%20Notes.ReadWrite.All%20offline_access
-   ```
+   ![Add a client secret](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-8.jpg)
 
-2. After you grant consent, the browser is redirected to your redirect URI with a `code` query parameter. Copy its value.
+2. Copy the secret **Value** immediately — it is shown only once. (The **Secret ID** shown next to it is just a label for the secret, not a credential.)
 
-3. Exchange the code for tokens:
+   ![Certificates & secrets](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-microsoft.onenote/refs/heads/main/docs/resources/setup-guide-9.png)
 
-   Read the client secret into an environment variable without echoing it, so that it does not appear in the command or the shell history:
+### Step 4: Obtain a refresh token
 
-   ```bash
-   read -rs CLIENT_SECRET && export CLIENT_SECRET
-   ```
+OneNote in Microsoft Graph does not support application-only access, so every operation runs on behalf of a signed-in user and the connector authenticates with a refresh token.
 
-   ```bash
-   curl --location 'https://login.microsoftonline.com/common/oauth2/v2.0/token' \
-   --header 'Content-Type: application/x-www-form-urlencoded' \
-   --data-urlencode 'grant_type=authorization_code' \
-   --data-urlencode 'code=<CODE>' \
-   --data-urlencode 'redirect_uri=<REDIRECT_URI>' \
-   --data-urlencode 'client_id=<CLIENT_ID>' \
-   --data-urlencode "client_secret=${CLIENT_SECRET}" \
-   --data-urlencode 'scope=Notes.ReadWrite Notes.Create Notes.ReadWrite.All offline_access'
-   ```
+Microsoft Entra's v2.0 endpoints for the app registered above:
 
-4. Store the `refresh_token` from the response securely. Use `https://login.microsoftonline.com/common/oauth2/v2.0/token` as the refresh URL. If the application is registered for your organization only, replace `common` with your tenant ID in both URLs.
+- Authorize: `https://login.microsoftonline.com/<TENANT>/oauth2/v2.0/authorize`
+- Token: `https://login.microsoftonline.com/<TENANT>/oauth2/v2.0/token`
 
-OneNote in Microsoft Graph no longer supports application-only access, so every operation needs a signed-in user.
+Replace `<TENANT>` with your **Directory (tenant) ID** if the application accepts accounts in your organization only, or with `common` if it also accepts other organizations and personal Microsoft accounts. Replace `<CLIENT_ID>` with the value from Step 1.
+
+**1. Get an authorization code.** This is an interactive sign-in and consent step, so paste this URL into a browser and sign in with the account whose notebooks the connector will use:
+
+```text
+https://login.microsoftonline.com/<TENANT>/oauth2/v2.0/authorize?client_id=<CLIENT_ID>&response_type=code&redirect_uri=https%3A%2F%2Fjwt.ms&response_mode=query&scope=Notes.ReadWrite%20Notes.Create%20Notes.ReadWrite.All%20offline_access&state=12345
+```
+
+Accept the consent prompt. You'll land on `https://jwt.ms/?code=<AUTH_CODE>&state=12345` — copy the `code` value from that URL. It's single-use and short-lived, so use it in the next step within a few minutes.
+
+**2. Exchange the code for a refresh token.** Read the client secret into an environment variable without echoing it, so that it does not appear in the command or the shell history, then call the token endpoint.
+
+macOS / Linux (bash, zsh):
+
+```bash
+read -rs CLIENT_SECRET && export CLIENT_SECRET
+```
+
+```bash
+curl -X POST "https://login.microsoftonline.com/<TENANT>/oauth2/v2.0/token" \
+  --data-urlencode "client_id=<CLIENT_ID>" \
+  --data-urlencode "client_secret=${CLIENT_SECRET}" \
+  --data-urlencode "scope=Notes.ReadWrite Notes.Create Notes.ReadWrite.All offline_access" \
+  --data-urlencode "code=<AUTH_CODE>" \
+  --data-urlencode "redirect_uri=https://jwt.ms" \
+  --data-urlencode "grant_type=authorization_code"
+```
+
+Windows (PowerShell — call `curl.exe` explicitly; plain `curl` is aliased to `Invoke-WebRequest` and takes different flags):
+
+```powershell
+$env:CLIENT_SECRET = [System.Net.NetworkCredential]::new('', (Read-Host -AsSecureString)).Password
+```
+
+```powershell
+curl.exe -X POST "https://login.microsoftonline.com/<TENANT>/oauth2/v2.0/token" `
+  --data-urlencode "client_id=<CLIENT_ID>" `
+  --data-urlencode "client_secret=$env:CLIENT_SECRET" `
+  --data-urlencode "scope=Notes.ReadWrite Notes.Create Notes.ReadWrite.All offline_access" `
+  --data-urlencode "code=<AUTH_CODE>" `
+  --data-urlencode "redirect_uri=https://jwt.ms" `
+  --data-urlencode "grant_type=authorization_code"
+```
+
+The JSON response includes a `refresh_token` field — store it securely and use it as `refreshToken` in `Config.toml`, with the token endpoint above as `refreshUrl`.
+
+> The `access_token` in the same response is short-lived (~1 hour) and isn't used directly; the connector uses `refreshToken` to obtain new access tokens automatically.
 
 ## Quickstart
 
